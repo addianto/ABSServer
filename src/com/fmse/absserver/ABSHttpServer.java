@@ -26,6 +26,8 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.TemplateResolver;
 
+import com.fmse.absserver.helper.DataTransformer;
+
 /**
  *
  * @author Salman
@@ -134,8 +136,13 @@ public class ABSHttpServer extends ABSObject
                     String view = pair.getArg(0).toString().replaceAll("\"", "");
                     List_Cons<ABSValue> data = (List_Cons<ABSValue>) pair.getArg(1);
                     
-                    System.out.println(((PaymentMessageImpl_c) data.getArg(0)).getCustomerName());
-                    System.out.println(((PaymentMessageImpl_c) data.getArg1().getArg(0)).getCustomerName());
+                    List<Object> dataModels = DataTransformer.convertABSListToJavaList(data);
+                    Context ctx = new Context();
+                    ctx.setVariable("dataList", dataModels);
+                    StringWriter writer = new StringWriter();
+                    
+                    templateEngine.process(view, ctx, writer);
+                    out.println(writer);
                 }
                
                 out.flush();
