@@ -1,30 +1,32 @@
 package com.fmse.absserver;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.List;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.templateresolver.TemplateResolver;
+
 import ABS.StdLib.List_Cons;
-import ABS.StdLib.Map;
 import ABS.StdLib.Pair;
-import ABS.StdLib.abs___f;
-import Model.PaymentMessage.PaymentMessageImpl_c;
 import abs.backend.java.lib.runtime.ABSObject;
 import abs.backend.java.lib.runtime.COG;
 import abs.backend.java.lib.runtime.StartUp;
 import abs.backend.java.lib.types.ABSString;
 import abs.backend.java.lib.types.ABSUnit;
 import abs.backend.java.lib.types.ABSValue;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.nio.CharBuffer;
-import java.util.HashMap;
-import java.util.List;
-
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.templateresolver.TemplateResolver;
 
 import com.fmse.absserver.helper.DataTransformer;
 
@@ -34,6 +36,9 @@ import com.fmse.absserver.helper.DataTransformer;
  */
 public class ABSHttpServer extends ABSObject 
 {
+	private static final String DEFAULT_CONFIG = "config.json";
+	
+	private JSONObject configJSON;
 
     @Override
     public String getClassName() 
@@ -55,9 +60,14 @@ public class ABSHttpServer extends ABSObject
     @Override
     public ABSUnit run() 
     {
+    	final String cwd = System.getProperty("user.dir");
+    	System.err.println("Current working directory: " + cwd);
+    	
     	ServerSocket serverSocket;
         try
         {
+            configJSON = parseConfig(new File(DEFAULT_CONFIG));
+            JSONObject test = (JSONObject) ((JSONObject) configJSON.get("config")).get("mapping");
             serverSocket = new ServerSocket(8080);
 
             while(true) {
@@ -155,6 +165,24 @@ public class ABSHttpServer extends ABSObject
         }
         
         return ABSUnit.UNIT;
+    }
+
+    private static JSONObject parseConfig(File file) throws IOException, 
+    	ParseException {
+    	StringBuilder JSONString = new StringBuilder();
+    	
+    	try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
+    		String line = "";
+
+    		while((line = reader.readLine())!= null)
+    			JSONString.append(line);
+    	}
+
+    	JSONParser parser = new JSONParser();
+    	
+    	System.err.println("JSON: " + JSONString.toString());
+
+    	return (JSONObject) parser.parse(JSONString.toString()); 
     }
     
     public static void main(String[] args) throws Exception 

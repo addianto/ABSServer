@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="lib/httpcore-ab-4.3.2.jar"/>
 	<classpathentry kind="lib" path="lib/httpcore-nio-4.3.2.jar"/>
 	<classpathentry kind="lib" path="lib/absfrontend.jar"/>
+	<classpathentry kind="lib" path="lib/json-simple-1.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
