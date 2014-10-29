@@ -1,0 +1,9 @@
+{
+    "config" : {
+        "mapping" : {
+            "/payment/index.abs" : "Controller.PostPaidPayment.PostPaidPaymentControllerImpl_c" ,
+            "/payment/inquiery.abs" : "Controller.PostPaidPayment.PostPaidPaymentControllerImpl_c",
+            "/product/list.abs" : "ModProductController.ProductControllerImpl_c"
+        }
+    }
+}
