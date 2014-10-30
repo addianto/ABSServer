@@ -1,6 +1,7 @@
 package com.fmse.absserver;
 
 import ABS.StdLib.List_Cons;
+import ABS.StdLib.List_Nil;
 import ABS.StdLib.Map;
 import ABS.StdLib.Pair;
 import ABS.StdLib.abs___f;
@@ -19,6 +20,7 @@ import java.io.StringWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.CharBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -55,18 +57,17 @@ public class ABSHttpServer extends ABSObject
     @Override
     public ABSUnit run() 
     {
-    	ServerSocket serverSocket;
+    	ServerSocket serverSocket = null;
+    	boolean isRunning = true;
+    	
         try
         {
             serverSocket = new ServerSocket(8080);
 
-            while(true) {
+            while(isRunning) {
                 Socket remote = serverSocket.accept();
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(remote.getInputStream()));
-
-                StringBuilder requestString = new StringBuilder();
-                HashMap<String, String> protocolMap = new HashMap<String, String>();
                 
                 String httpRequestLine = in.readLine();
                 String requestMethod = httpRequestLine.split(" ")[0];
@@ -76,6 +77,7 @@ public class ABSHttpServer extends ABSObject
                 System.out.println(httpRequestLine);
                 
                 String line;
+                HashMap<String, String> headers = new HashMap<String, String>();
                 while((line = in.readLine()) != null)
                 {
                 	if(line.equals("")) 
@@ -86,7 +88,7 @@ public class ABSHttpServer extends ABSObject
                 	if(!line.equals(" "))
                 	{
                 		String[] protocol = line.split(": ");
-                		protocolMap.put(protocol[0], protocol[1]);
+                		headers.put(protocol[0], protocol[1]);
                 		System.out.println(line);
                 	}
                 }
@@ -100,54 +102,19 @@ public class ABSHttpServer extends ABSObject
                 	System.out.println(buffer);
                 }
                 
-                System.out.println(requestString.toString());
-                PrintWriter out = new PrintWriter(remote.getOutputStream());
-                out.println("HTTP/1.1 200 OK");
-                out.println("Content-Type: text/html");
-                out.println("Server: ABSServer");
+                ABSHttpRequest request = new ABSHttpRequest();
+                request.setRequestMethod(requestMethod);
+                request.setRequestUri(requestUri);
+                request.setRequestVersion(requestVersion);
+                request.setHeaders(headers);
                 
-                out.println("");
+                ABSRequestHandler handler = new ABSRequestHandler(this);
+                handler.handle(request, remote.getOutputStream());
                 
-                String[] protocols = requestString.toString().split("\n");
-                String url[] = protocols[0].split(" ");
-                
-                String html = "<h1>Welcome to ABS HTTP Server</h1>";
-                TemplateResolver templateResolver = new TemplateResolver();
-                templateResolver.setTemplateMode("XHTML");
-                templateResolver.setSuffix(".html");
-                templateResolver.setResourceResolver(new ABSResourceResolver());
-                
-                TemplateEngine templateEngine = new TemplateEngine();
-                templateEngine.setTemplateResolver(templateResolver);
-                
-                if(requestUri.equals("/payment/index.abs")) 
-                {
-                    Class controller = Class.forName("Controller.PostPaidPayment.PostPaidPaymentControllerImpl_c");
-                    Object obj = controller.getMethod("__ABS_createNewObject", ABSObject.class).invoke(controller, this);
-                    Pair<ABSString, ABS.StdLib.List<ABSValue>> pair = (Pair<ABSString, ABS.StdLib.List<ABSValue>>) obj.getClass().getMethod("index").invoke(obj);
-                    String view = pair.getArg(0).toString().replaceAll("\"", "");
-                    System.out.println(view);
-                }
-                else if(requestUri.equals("/payment/inquiry.abs")) 
-                {
-                	Class controller = Class.forName("Controller.PostPaidPayment.PostPaidPaymentControllerImpl_c");
-                    Object obj = controller.getMethod("__ABS_createNewObject", ABSObject.class).invoke(controller, this);
-                    Pair<ABSString, ABS.StdLib.List<ABSValue>> pair = (Pair<ABSString, ABS.StdLib.List<ABSValue>>) obj.getClass().getMethod("inquiry").invoke(obj);
-                    String view = pair.getArg(0).toString().replaceAll("\"", "");
-                    List_Cons<ABSValue> data = (List_Cons<ABSValue>) pair.getArg(1);
-                    
-                    List<Object> dataModels = DataTransformer.convertABSListToJavaList(data);
-                    Context ctx = new Context();
-                    ctx.setVariable("dataList", dataModels);
-                    StringWriter writer = new StringWriter();
-                    
-                    templateEngine.process(view, ctx, writer);
-                    out.println(writer);
-                }
-               
-                out.flush();
                 remote.close();
             }
+            
+            serverSocket.close();
         }
         catch(Exception e) 
         {

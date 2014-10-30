@@ -1,16 +1,10 @@
 package com.fmse.absserver.helper;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.ListIterator;
 
 import abs.backend.java.lib.runtime.ABSObject;
-import abs.backend.java.lib.runtime.ABSRuntime;
+import abs.backend.java.lib.types.ABSString;
 import abs.backend.java.lib.types.ABSValue;
-
-import java.util.List;
-
-import com.fmse.absserver.ABSHttpServer;
 
 public class DataTransformer 
 {
@@ -24,19 +18,16 @@ public class DataTransformer
 			ABSObject head = (ABSObject) ABS.StdLib.head_f.apply(target);
 			result.add(head);
 			
-			String canonicalName = head.getClass().getCanonicalName();
-			List<String> fieldNames = head.getFieldNames();
-			for(String fieldName : fieldNames)
-			{
-				String methodName = "get" 
-						+ fieldName.substring(0, 1).toUpperCase() 
-						+ fieldName.substring(1);
-			}
-			
 			target = ABS.StdLib.tail_f.apply(target);
 		}
 		while(!(target instanceof ABS.StdLib.List_Nil));
 
 		return result;
+	}
+	
+	public static String
+		convertABSStringToJavaString(ABSString target) throws Exception
+	{
+		return target.toString().replaceAll("\"", "");
 	}
 }
