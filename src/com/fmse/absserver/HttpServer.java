@@ -19,6 +19,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +36,7 @@ import com.fmse.absserver.helper.DataTransformer;
  *
  * @author Salman
  */
-public class ABSHttpServer extends ABSObject 
+public class HttpServer extends ABSObject 
 {
 
     @Override
@@ -49,7 +51,7 @@ public class ABSHttpServer extends ABSObject
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
-    public ABSHttpServer(COG cog) 
+    public HttpServer(COG cog) 
     {
         super(cog);
     }
@@ -93,22 +95,33 @@ public class ABSHttpServer extends ABSObject
                 	}
                 }
                 
+                HttpRequest request = new HttpRequest();
+                request.setRequestMethod(requestMethod);
+                request.setRequestUri(requestUri);
+                request.setRequestVersion(requestVersion);
+                request.setHeaders(headers);
+                
                 if(requestMethod.equals("POST"))
                 {
                 	System.out.println("Getting POST Request");
                 	char[] buffer = new char[100];
                 	in.read(buffer);
                 	
-                	System.out.println(buffer);
+                	String inputString = URLDecoder.decode(new String(buffer), "UTF-8");
+                	String[] inputs = inputString.split("&");
+                	
+                	HashMap<String, String> requestInputs = new HashMap<String, String>();
+                	for (String input : inputs) 
+                	{
+						String key = input.split("=")[0];
+						String value = input.split("=")[1];
+						requestInputs.put(key, value);
+					}
+                	
+                	request.setRequestInputs(requestInputs);
                 }
                 
-                ABSHttpRequest request = new ABSHttpRequest();
-                request.setRequestMethod(requestMethod);
-                request.setRequestUri(requestUri);
-                request.setRequestVersion(requestVersion);
-                request.setHeaders(headers);
-                
-                ABSRequestHandler handler = new ABSRequestHandler(this);
+                RequestHandler handler = new RequestHandler(this);
                 handler.handle(request, remote.getOutputStream());
                 
                 remote.close();
@@ -126,7 +139,7 @@ public class ABSHttpServer extends ABSObject
     
     public static void main(String[] args) throws Exception 
     {
-        StartUp.startup(new String[0], ABSHttpServer.class);
+        StartUp.startup(new String[0], HttpServer.class);
     }
     
 }

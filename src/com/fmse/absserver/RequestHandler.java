@@ -20,17 +20,17 @@ import abs.backend.java.lib.types.ABSValue;
 
 import com.fmse.absserver.helper.DataTransformer;
 
-public class ABSRequestHandler
+public class RequestHandler
 {
 	private static final String ABS_REQUEST_PATTERN = "([^\\s]+(\\.(?i)(abs))$)";
-	protected ABSHttpServer absContext;
+	protected HttpServer absContext;
 	
-	public ABSRequestHandler(ABSHttpServer absContext)
+	public RequestHandler(HttpServer absContext)
 	{
 		this.absContext = absContext;
 	}
 	
-	public void handle(ABSHttpRequest request, OutputStream os) throws Exception
+	public void handle(HttpRequest request, OutputStream os) throws Exception
 	{
 		PrintWriter out = new PrintWriter(os);
         out.println("HTTP/1.1 200 OK");
@@ -41,7 +41,7 @@ public class ABSRequestHandler
         TemplateResolver templateResolver = new TemplateResolver();
         templateResolver.setTemplateMode("XHTML");
         templateResolver.setSuffix(".html");
-        templateResolver.setResourceResolver(new ABSResourceResolver());
+        templateResolver.setResourceResolver(new ResourceResolver());
         
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);

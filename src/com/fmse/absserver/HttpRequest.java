@@ -2,12 +2,19 @@ package com.fmse.absserver;
 
 import java.util.HashMap;
 
-public class ABSHttpRequest 
+public class HttpRequest 
 {
 	protected String requestMethod;
 	protected String requestUri;
 	protected String requestVersion;
 	protected HashMap<String, String> headers;
+	protected HashMap<String, String> requestInputs;
+	
+	public HttpRequest()
+	{
+		this.headers = new HashMap<String, String>();
+		this.requestInputs = new HashMap<String, String>();
+	}
 	
 	public String getRequestMethod() 
 	{
@@ -39,12 +46,23 @@ public class ABSHttpRequest
 		this.requestVersion = requestVersion;
 	}
 
-	public HashMap<String, String> getHeaders() {
+	public HashMap<String, String> getHeaders() 
+	{
 		return headers;
 	}
 
 	public void setHeaders(HashMap<String, String> headers) 
 	{
 		this.headers = headers;
-	}	
+	}
+
+	public HashMap<String, String> getRequestInputs()
+	{
+		return requestInputs;
+	}
+
+	public void setRequestInputs(HashMap<String, String> requestInputs)
+	{
+		this.requestInputs = requestInputs;
+	}
 }
