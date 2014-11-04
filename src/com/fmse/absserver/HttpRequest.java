@@ -2,6 +2,10 @@ package com.fmse.absserver;
 
 import java.util.HashMap;
 
+/**
+ * 
+ * @author Salman El Farisi
+ */
 public class HttpRequest 
 {
 	protected String requestMethod;

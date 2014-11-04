@@ -18,17 +18,18 @@ import ABS.Framework.Http.ABSHttpRequestImpl_c;
 import ABS.Framework.Http.ABSHttpRequest_i;
 import ABS.StdLib.List_Cons;
 import ABS.StdLib.List_Nil;
-import ABS.StdLib.Map;
-import ABS.StdLib.Map_InsertAssoc;
 import ABS.StdLib.Pair;
 import ABS.StdLib.Pair_Pair;
 import abs.backend.java.lib.runtime.ABSObject;
-import abs.backend.java.lib.types.ABSClass;
 import abs.backend.java.lib.types.ABSString;
 import abs.backend.java.lib.types.ABSValue;
 
 import com.fmse.absserver.helper.DataTransformer;
 
+/**
+ * 
+ * @author Salman El Farisi
+ */
 public class RequestHandler
 {
 	private static final String ABS_REQUEST_PATTERN = "([^\\s]+(\\.(?i)(abs))$)";
