@@ -104,7 +104,9 @@ public class HttpServer extends ABSObject
                 if(requestMethod.equals("POST"))
                 {
                 	System.out.println("Getting POST Request");
-                	char[] buffer = new char[100];
+                	HashMap<String, String> requestHeaders = request.getHeaders();
+                	Integer contentLength = Integer.parseInt(requestHeaders.get("Content-Length"));
+                	char[] buffer = new char[contentLength];
                 	in.read(buffer);
                 	
                 	String inputString = URLDecoder.decode(new String(buffer), "UTF-8");
@@ -115,6 +117,7 @@ public class HttpServer extends ABSObject
                 	{
 						String key = input.split("=")[0];
 						String value = input.split("=")[1];
+						System.out.println(value);
 						requestInputs.put(key, value);
 					}
                 	
