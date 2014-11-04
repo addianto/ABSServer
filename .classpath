@@ -8,12 +8,12 @@
 	<classpathentry kind="lib" path="lib/thymeleaf-2.1.3.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/unbescape-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/absbackend.jar"/>
-	<classpathentry kind="lib" path="lib/app.jar"/>
 	<classpathentry kind="lib" path="lib/commons-cli-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/httpcore-4.3.2.jar"/>
 	<classpathentry kind="lib" path="lib/httpcore-ab-4.3.2.jar"/>
 	<classpathentry kind="lib" path="lib/httpcore-nio-4.3.2.jar"/>
 	<classpathentry kind="lib" path="lib/absfrontend.jar"/>
 	<classpathentry kind="lib" path="lib/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="/ECom/dist/app.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -21,6 +21,8 @@ import org.thymeleaf.templateresolver.TemplateResolver;
 
 import ABS.StdLib.List_Cons;
 import ABS.StdLib.Pair;
+import ModProductController.ProductControllerImpl_c;
+import ModProductData.ProductData_i;
 import abs.backend.java.lib.runtime.ABSObject;
 import abs.backend.java.lib.runtime.COG;
 import abs.backend.java.lib.runtime.StartUp;
@@ -149,6 +151,63 @@ public class ABSHttpServer extends ABSObject
                     List<Object> dataModels = DataTransformer.convertABSListToJavaList(data);
                     Context ctx = new Context();
                     ctx.setVariable("dataList", dataModels);
+                    StringWriter writer = new StringWriter();
+                    
+                    templateEngine.process(view, ctx, writer);
+                    out.println(writer);
+                } else if(requestUri.equals("/product/list.abs")) {
+                	Class dataSource = Class.forName("ModProductData.ProductDataImpl_c");
+                	Class controller = Class.forName("ModProductController.ProductControllerImpl_c");
+
+                	Object dataObj = dataSource.getMethod("__ABS_createNewObject", ABSObject.class).invoke(dataSource, this);
+                	ProductData_i absDataObj = (ProductData_i) dataObj;
+
+                    Object obj = controller.getMethod("__ABS_createNewObject", ABSObject.class, ProductData_i.class).invoke(controller, this, absDataObj);
+                    Pair<ABSString, ABS.StdLib.List<ABSValue>> pair = (Pair<ABSString, ABS.StdLib.List<ABSValue>>) obj.getClass().getMethod("list").invoke(obj);
+                    String view = pair.getArg(0).toString().replaceAll("\"", "");
+                    List_Cons<ABSValue> data = (List_Cons<ABSValue>) pair.getArg(1);
+                    
+                    List<Object> products = DataTransformer.convertABSListToJavaList(data);
+                    Context ctx = new Context();
+                    ctx.setVariable("dataList", products);
+                    StringWriter writer = new StringWriter();
+                    
+                    templateEngine.process(view, ctx, writer);
+                    out.println(writer);
+                } else if(requestUri.equals("/product/search.abs")) {
+                	System.err.println("[Debug] Enter product search");
+                    // TODO: Get POST parameter
+                    ABSString postQuery = ABSString.fromString("test");
+                    
+                    Class dataSource = Class.forName("ModProductData.ProductDataImpl_c");
+                	Class controller = Class.forName("ModProductController.ProductControllerImpl_c");
+                	
+                	Object dataObj = dataSource.getMethod("__ABS_createNewObject", ABSObject.class).invoke(dataSource, this);
+                	ProductData_i absDataObj = (ProductData_i) dataObj;
+
+                    Object obj = controller.getMethod("__ABS_createNewObject", ABSObject.class, ProductData_i.class).invoke(controller, this, absDataObj);
+                    
+                    // TODO: Refactor baris di bawah ini. Kepanjangan kalau jadi satu baris panjang
+                    Pair<ABSString, ABS.StdLib.List<ABSValue>> pair = (Pair<ABSString, ABS.StdLib.List<ABSValue>>) obj.getClass().getMethod("search", new Class[] {ABSString.class}).invoke(obj, postQuery);
+                    String view = pair.getArg(0).toString().replaceAll("\"", "");
+                    List_Cons<ABSValue> data = (List_Cons<ABSValue>) pair.getArg(1);
+                    
+                    List<Object> products = DataTransformer.convertABSListToJavaList(data);
+                    Context ctx = new Context();
+                    ctx.setVariable("dataList", products);
+                    StringWriter writer = new StringWriter();
+
+                	System.err.println("[Debug] Before view render product search");
+                    
+                    templateEngine.process(view, ctx, writer);
+                    out.println(writer);
+                } else if(requestUri.equals("/contact_us.abs")) {
+                	Class controller = Class.forName("ModStaticPageController.ContactUsControllerImpl");
+                    Object obj = controller.getMethod("__ABS_createNewObject", ABSObject.class).invoke(controller, this);
+                    Pair<ABSString, ABS.StdLib.List<ABSValue>> pair = (Pair<ABSString, ABS.StdLib.List<ABSValue>>) obj.getClass().getMethod("list").invoke(obj);
+                    String view = pair.getArg(0).toString().replaceAll("\"", "");
+                    
+                    Context ctx = new Context();
                     StringWriter writer = new StringWriter();
                     
                     templateEngine.process(view, ctx, writer);
