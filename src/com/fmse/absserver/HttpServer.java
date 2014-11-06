@@ -5,7 +5,6 @@ import ABS.StdLib.List_Nil;
 import ABS.StdLib.Map;
 import ABS.StdLib.Pair;
 import ABS.StdLib.abs___f;
-import Model.PaymentMessage.PaymentMessageImpl_c;
 import abs.backend.java.lib.runtime.ABSObject;
 import abs.backend.java.lib.runtime.COG;
 import abs.backend.java.lib.runtime.StartUp;
