@@ -1,35 +1,16 @@
 package com.fmse.absserver;
 
-import ABS.StdLib.List_Cons;
-import ABS.StdLib.List_Nil;
-import ABS.StdLib.Map;
-import ABS.StdLib.Pair;
-import ABS.StdLib.abs___f;
 import abs.backend.java.lib.runtime.ABSObject;
 import abs.backend.java.lib.runtime.COG;
 import abs.backend.java.lib.runtime.StartUp;
-import abs.backend.java.lib.types.ABSString;
 import abs.backend.java.lib.types.ABSUnit;
-import abs.backend.java.lib.types.ABSValue;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.CharBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.templateresolver.TemplateResolver;
-
-import com.fmse.absserver.helper.DataTransformer;
 
 /**
  *
