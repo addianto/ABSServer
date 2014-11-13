@@ -112,7 +112,7 @@ public class HttpServer extends ABSObject
                 		String inputSegment = splittedUri[1];
                 		
                 		request.setRequestUri(requestSegment);
-                		String[] inputData = inputSegment.split("\\&");
+                		String[] inputData = inputSegment.split("&");
 
                 		HashMap<String, String> requestInputs = new HashMap<String, String>();
                 		for (String input : inputData) 
