@@ -45,6 +45,7 @@ public class HttpServer extends ABSObject
         try
         {
             serverSocket = new ServerSocket(8080);
+            System.out.println("Listening on http://localhost:8080");
 
             while(isRunning) {
                 Socket remote = serverSocket.accept();
@@ -71,7 +72,6 @@ public class HttpServer extends ABSObject
                 	{
                 		String[] protocol = line.split(": ");
                 		headers.put(protocol[0], protocol[1]);
-                		System.out.println(line);
                 	}
                 }
                 
@@ -83,7 +83,6 @@ public class HttpServer extends ABSObject
                 
                 if(requestMethod.equals("POST"))
                 {
-                	System.out.println("Getting POST Request");
                 	HashMap<String, String> requestHeaders = request.getHeaders();
                 	Integer contentLength = Integer.parseInt(requestHeaders.get("Content-Length"));
                 	char[] buffer = new char[contentLength];
@@ -97,11 +96,35 @@ public class HttpServer extends ABSObject
                 	{
 						String key = input.split("=")[0];
 						String value = input.split("=")[1];
-						System.out.println(value);
 						requestInputs.put(key, value);
 					}
                 	
                 	request.setRequestInputs(requestInputs);
+                }
+                else if(requestMethod.equals("GET"))
+                {
+                	String uri = request.getRequestUri();
+                	String[] splittedUri = uri.split("\\?");
+                	
+                	if(splittedUri.length > 1)
+                	{
+                		String requestSegment = splittedUri[0];
+                		String inputSegment = splittedUri[1];
+                		
+                		request.setRequestUri(requestSegment);
+                		String[] inputData = inputSegment.split("\\&");
+
+                		HashMap<String, String> requestInputs = new HashMap<String, String>();
+                		for (String input : inputData) 
+                		{
+                			String key = URLDecoder.decode(input.split("=")[0], "UTF-8");
+                			String value = URLDecoder.decode(input.split("=")[1], "UTF-8");
+                			
+                			requestInputs.put(key, value);
+						}
+                		
+                		request.setRequestInputs(requestInputs);
+                	}
                 }
                 
                 RequestHandler handler = new RequestHandler(this);

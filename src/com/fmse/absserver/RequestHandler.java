@@ -3,6 +3,7 @@ package com.fmse.absserver;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -62,31 +63,47 @@ public class RequestHandler
         	Class resolver = Class.forName("ABS.Framework.Route.RouteConfigImpl_c");
             Object resolverObj = resolver.getMethod("__ABS_createNewObject", ABSObject.class).invoke(resolver, absContext);
             ABSString absResult = (ABSString) resolver.getMethod("route", ABSString.class).invoke(resolverObj, ABSString.fromString(request.getRequestUri()));
-            String result = DataTransformer.convertABSStringToJavaString(absResult);              
-    		
-            String controllerName = result.split("@")[0] + "_c";
-            String methodName = result.split("@")[1];
-            
-            ABSHttpRequest_i absHttpRequest = this.createABSHttpRequest(request);
-            Class controllerClazz = Class.forName(controllerName);
-            Object obj = controllerClazz.getMethod("__ABS_createNewObject", ABSObject.class).invoke(controllerClazz, absContext);
-            Pair<ABSString, ABS.StdLib.List<ABSValue>> pair = (Pair<ABSString, ABS.StdLib.List<ABSValue>>) obj.getClass()
-            		.getMethod(methodName, ABSHttpRequest_i.class).invoke(obj, absHttpRequest);
-            String view = DataTransformer.convertABSStringToJavaString((ABSString) pair.getArg(0));
-            List_Cons<ABSValue> data;
-            
-            Context ctx = new Context();
-            if(!(pair.getArg(1) instanceof List_Nil))
-            {
-            	data = (List_Cons<ABSValue>) pair.getArg(1);
-            	List<Object> dataModels = DataTransformer.convertABSListToJavaList(data);
-            	ctx.setVariable("dataList", dataModels);
-            }
+            String result = DataTransformer.convertABSStringToJavaString(absResult);
             
             StringWriter writer = new StringWriter();
-            templateEngine.process(view, ctx, writer);
+            if(!result.isEmpty())
+            {
+            	String controllerName = result.split("@")[0] + "_c";
+                String methodName = result.split("@")[1];
+                
+                ABSHttpRequest_i absHttpRequest = this.createABSHttpRequest(request);
+                Class controllerClazz = Class.forName(controllerName);
+                Object obj = controllerClazz.getMethod("__ABS_createNewObject", ABSObject.class).invoke(controllerClazz, absContext);
+                Pair<ABSString, ABS.StdLib.List<ABSValue>> pair = (Pair<ABSString, ABS.StdLib.List<ABSValue>>) obj.getClass()
+                		.getMethod(methodName, ABSHttpRequest_i.class).invoke(obj, absHttpRequest);
+                String view = DataTransformer.convertABSStringToJavaString((ABSString) pair.getArg(0));
+                List_Cons<ABSValue> data;
+                
+                Context ctx = new Context();
+                if(!(pair.getArg(1) instanceof List_Nil))
+                {
+                	data = (List_Cons<ABSValue>) pair.getArg(1);
+                	List<Object> dataModels = DataTransformer.convertABSListToJavaList(data);
+                	
+                	if(dataModels.size() > 1)
+                	{
+                		ctx.setVariable("dataList", dataModels);
+                	}
+                	else
+                	{
+                		ctx.setVariable("data", dataModels.get(0));
+                	}
+                }
+                
+                templateEngine.process(view, ctx, writer);
+            }
+            else
+            {
+            	writer.write("<h3>ERROR 404: PAGE NOT FOUND</h3>");
+            	writer.write("<span style='font-size:0.8em;'>ABS Server: " + new Date() + "</span><br />");
+            }
+            
             out.println(writer);
-
             out.flush();
         }
 	}

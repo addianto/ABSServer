@@ -9,6 +9,7 @@
 	<classpathentry kind="lib" path="lib/unbescape-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-cli-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/absfrontend.jar"/>
-	<classpathentry kind="lib" path="lib/absmvc.jar"/>
+	<classpathentry kind="lib" path="D:/GitHub/ABSServer/lib/absbackend.jar"/>
+	<classpathentry kind="lib" path="D:/GitHub/ABSServer/web/app.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
