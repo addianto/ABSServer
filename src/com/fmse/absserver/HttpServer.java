@@ -8,6 +8,9 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import abs.backend.java.lib.runtime.ABSObject;
 import abs.backend.java.lib.runtime.COG;
 import abs.backend.java.lib.runtime.StartUp;
@@ -19,6 +22,7 @@ import abs.backend.java.lib.types.ABSUnit;
  */
 public class HttpServer extends ABSObject {
 	
+	private static final Logger LOGGER = LoggerFactory.getLogger(HttpServer.class);
 	private static final int DEFAULT_PORT = 8080;
 
     @Override
@@ -54,7 +58,11 @@ public class HttpServer extends ABSObject {
                 String requestUri = httpRequestLine.split(" ")[1];
                 String requestVersion = httpRequestLine.split(" ")[2];
                 
-                System.out.println(httpRequestLine);
+                LOGGER.info("HTTP Request: " + httpRequestLine);
+                LOGGER.info("Request Method: " + requestMethod);
+                LOGGER.info("Request URI: " + requestUri);
+                
+                //System.out.println(httpRequestLine);
                 
                 String line;
                 HashMap<String, String> headers = new HashMap<String, String>();
@@ -88,6 +96,7 @@ public class HttpServer extends ABSObject {
                 	in.read(buffer);
                 	
                 	String inputString = URLDecoder.decode(new String(buffer), "UTF-8");
+                	LOGGER.info("Input: " + inputString);
                 	String[] inputs = inputString.split("&");
                 	
                 	HashMap<String, String> requestInputs = new HashMap<String, String>();

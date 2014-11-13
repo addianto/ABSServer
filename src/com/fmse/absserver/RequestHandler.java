@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.TemplateResolver;
@@ -32,6 +34,7 @@ import com.fmse.absserver.helper.DataTransformer;
  */
 public class RequestHandler
 {
+	private static final Logger LOGGER = LoggerFactory.getLogger(RequestHandler.class);
 	private static final String ABS_REQUEST_PATTERN = "([^\\s]+(\\.(?i)(abs))$)";
 	protected HttpServer absContext;
 	
@@ -66,6 +69,9 @@ public class RequestHandler
             String controllerName = result.split("@")[0] + "_c";
             String methodName = result.split("@")[1];
             
+            LOGGER.info(String.format("Requested controller & method: %s : %s", 
+            		controllerName, methodName));
+            
             ABSHttpRequest_i absHttpRequest = this.createABSHttpRequest(request);
             Class controllerClazz = Class.forName(controllerName);
             Object obj = controllerClazz.getMethod("__ABS_createNewObject", ABSObject.class).invoke(controllerClazz, absContext);
@@ -73,6 +79,8 @@ public class RequestHandler
             		.getMethod(methodName, ABSHttpRequest_i.class).invoke(obj, absHttpRequest);
             String view = DataTransformer.convertABSStringToJavaString((ABSString) pair.getArg(0));
             List_Cons<ABSValue> data;
+            
+            LOGGER.info("Requested view: " + view);
             
             Context ctx = new Context();
             if(!(pair.getArg(1) instanceof List_Nil))
