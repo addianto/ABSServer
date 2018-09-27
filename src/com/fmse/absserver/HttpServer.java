@@ -1,36 +1,16 @@
 package com.fmse.absserver;
 
-import ABS.StdLib.List_Cons;
-import ABS.StdLib.List_Nil;
-import ABS.StdLib.Map;
-import ABS.StdLib.Pair;
-import ABS.StdLib.abs___f;
-import Model.PaymentMessage.PaymentMessageImpl_c;
 import abs.backend.java.lib.runtime.ABSObject;
 import abs.backend.java.lib.runtime.COG;
 import abs.backend.java.lib.runtime.StartUp;
-import abs.backend.java.lib.types.ABSString;
 import abs.backend.java.lib.types.ABSUnit;
-import abs.backend.java.lib.types.ABSValue;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.CharBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.templateresolver.TemplateResolver;
-
-import com.fmse.absserver.helper.DataTransformer;
 
 /**
  *
@@ -65,6 +45,7 @@ public class HttpServer extends ABSObject
         try
         {
             serverSocket = new ServerSocket(8080);
+            System.out.println("Listening on http://localhost:8080");
 
             while(isRunning) {
                 Socket remote = serverSocket.accept();
@@ -91,7 +72,6 @@ public class HttpServer extends ABSObject
                 	{
                 		String[] protocol = line.split(": ");
                 		headers.put(protocol[0], protocol[1]);
-                		System.out.println(line);
                 	}
                 }
                 
@@ -103,7 +83,6 @@ public class HttpServer extends ABSObject
                 
                 if(requestMethod.equals("POST"))
                 {
-                	System.out.println("Getting POST Request");
                 	HashMap<String, String> requestHeaders = request.getHeaders();
                 	Integer contentLength = Integer.parseInt(requestHeaders.get("Content-Length"));
                 	char[] buffer = new char[contentLength];
@@ -117,11 +96,35 @@ public class HttpServer extends ABSObject
                 	{
 						String key = input.split("=")[0];
 						String value = input.split("=")[1];
-						System.out.println(value);
 						requestInputs.put(key, value);
 					}
                 	
                 	request.setRequestInputs(requestInputs);
+                }
+                else if(requestMethod.equals("GET"))
+                {
+                	String uri = request.getRequestUri();
+                	String[] splittedUri = uri.split("\\?");
+                	
+                	if(splittedUri.length > 1)
+                	{
+                		String requestSegment = splittedUri[0];
+                		String inputSegment = splittedUri[1];
+                		
+                		request.setRequestUri(requestSegment);
+                		String[] inputData = inputSegment.split("&");
+
+                		HashMap<String, String> requestInputs = new HashMap<String, String>();
+                		for (String input : inputData) 
+                		{
+                			String key = URLDecoder.decode(input.split("=")[0], "UTF-8");
+                			String value = URLDecoder.decode(input.split("=")[1], "UTF-8");
+                			
+                			requestInputs.put(key, value);
+						}
+                		
+                		request.setRequestInputs(requestInputs);
+                	}
                 }
                 
                 RequestHandler handler = new RequestHandler(this);
